@@ -16,7 +16,15 @@ markup_menu = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
 btn_address = types.KeyboardButton('🍔 Ближайший Burger Heroes', request_location=True)
 btn_payment = types.KeyboardButton('💵 Способы оплаты')
 btn_delivery = types.KeyboardButton('🚗 Способы доставки')
-markup_menu.add(btn_address, btn_payment, btn_delivery)
+btn_games = types.KeyboardButton('🎮 Игры')
+markup_menu.add(btn_address, btn_payment, btn_delivery, btn_games)
+
+markup_menu2 = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+btn_game1 = types.KeyboardButton('Игра 1')
+btn_game2 = types.KeyboardButton('Игра 2')
+btn_game3 = types.KeyboardButton('Игра 3')
+btn_back  = types.KeyboardButton('⬅ Назад')
+markup_menu2.add(btn_game1, btn_game2, btn_game3, btn_back)
 
 markup_inline_payment = types.InlineKeyboardMarkup(row_width=1)
 btn_in_cash = types.InlineKeyboardButton('Наличные', callback_data='cash')
@@ -28,18 +36,28 @@ markup_inline_payment.add(btn_in_cash, btn_in_card, btn_in_invoice)
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    bot.reply_to(message, "Привет! Я супербот. Жми  на кнопки", reply_markup=markup_menu)
+    bot.send_message(message.chat.id, "Привет! Я супербот. Жми  на кнопки", reply_markup=markup_menu)
 
 
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
     if message.text == "🚗 Способы доставки":
         bot.reply_to(message, "Курьерская доставка!", reply_markup=markup_menu)
+    elif message.text == "🎮 Игры":
+        bot.send_message(message.chat.id, "В какую игру вы хотите сыграть?", reply_markup=markup_menu2)
     elif message.text == "💵 Способы оплаты":
-        bot.reply_to(message, "Вы можете оплатить разными способами! ",
+        bot.send_message(message.chat.id, "Вы можете оплатить разными способами! ",
                      reply_markup=markup_inline_payment)
+    elif message.text == "Игра 1":
+        bot.send_message(message.chat.id, "Пока не работает", reply_markup=markup_menu)
+    elif message.text == "Игра 2":
+        bot.send_message(message.chat.id, "Пока не работает", reply_markup=markup_menu)
+    elif message.text == "Игра 3":
+        bot.send_message(message.chat.id, "Пока не работает", reply_markup=markup_menu)
+    elif message.text == "⬅ Назад":
+        bot.send_message(message.chat.id, "И снова привет! Я супербот. Жми  на кнопки", reply_markup=markup_menu)
     else:
-        bot.reply_to(message, message.text, reply_markup=markup_menu)
+        bot.send_message(message.chat.id, "Я пока не научился отвечать на это, жми кнопки!", reply_markup=markup_menu)
 
 
 @bot.message_handler(func=lambda message: True, content_types=['location'])
@@ -68,7 +86,6 @@ def call_back_payment(call):
         Можно оплатить картой""", reply_markup=markup_inline_payment)
     elif call.data == 'invoice':
         bot.send_message(call.message.chat.id, text="""
-        Можно банковским переводом""", reply_markup=markup_inline_payment)    
-
+        Можно банковским переводом""", reply_markup=markup_inline_payment)
 
 bot.polling()
